@@ -4,7 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.saber</groupId>
     <artifactId>saber-microservice-axon-cqrs-saga-test1</artifactId>
+    <packaging>pom</packaging>
     <version>0.0.1-SNAPSHOT</version>
+    <modules>
+        <module>saber-microservice-common-dto</module>
+    </modules>
     <name>saber-microservice-axon-cqrs-saga-test1</name>
     <description>saber-microservice-axon-cqrs-saga-test1</description>
 
