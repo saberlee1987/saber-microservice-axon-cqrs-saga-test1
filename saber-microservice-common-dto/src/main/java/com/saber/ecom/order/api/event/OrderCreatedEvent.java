@@ -15,7 +15,9 @@ public class OrderCreatedEvent implements Serializable {
     public OrderCreatedEvent() {
     }
 
-    public OrderCreatedEvent(Integer orderId, Double price, Integer number, String productDescription, String orderStatus, Integer productId) {
+    public OrderCreatedEvent(Integer orderId, Double price, Integer number,
+                             String productDescription, String orderStatus,
+                             Integer productId) {
         this.orderId = orderId;
         this.price = price;
         this.number = number;
