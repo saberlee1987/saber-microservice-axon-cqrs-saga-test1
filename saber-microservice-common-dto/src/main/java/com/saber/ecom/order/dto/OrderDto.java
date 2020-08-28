@@ -3,15 +3,13 @@ package com.saber.ecom.order.dto;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class OrderDto implements Serializable {
+public class OrderDto implements Serializable, Cloneable {
 
     private Integer id;
     private Double price;
     private Integer number;
     private String orderStatus;
     private String productDescription;
-    private Integer productId;
-
     public OrderDto() {
     }
 
@@ -63,13 +61,6 @@ public class OrderDto implements Serializable {
         this.productDescription = productDescription;
     }
 
-    public Integer getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Integer productId) {
-        this.productId = productId;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -80,13 +71,21 @@ public class OrderDto implements Serializable {
                 Objects.equals(price, orderDto.price) &&
                 Objects.equals(number, orderDto.number) &&
                 Objects.equals(orderStatus, orderDto.orderStatus) &&
-                Objects.equals(productDescription, orderDto.productDescription) &&
-                Objects.equals(productId, orderDto.productId);
+                Objects.equals(productDescription, orderDto.productDescription)   ;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, price, number, orderStatus, productDescription, productId);
+        return Objects.hash(id, price, number, orderStatus, productDescription);
+    }
+
+    @Override
+    public OrderDto clone() {
+        try {
+            return (OrderDto) super.clone();
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -97,7 +96,6 @@ public class OrderDto implements Serializable {
                 ", number=" + number +
                 ", orderStatus='" + orderStatus + '\'' +
                 ", productDescription='" + productDescription + '\'' +
-                ", productId=" + productId +
                 '}';
     }
 }

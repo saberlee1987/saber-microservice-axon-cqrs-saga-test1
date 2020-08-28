@@ -3,7 +3,7 @@ package com.saber.ecom.product.dto;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class ProductDto implements Serializable {
+public class ProductDto implements Serializable,Cloneable {
     private Integer id;
     private Double price;
     private Integer stock;
@@ -65,6 +65,15 @@ public class ProductDto implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, price, stock, description);
+    }
+
+    @Override
+    public ProductDto clone()  {
+        try {
+            return (ProductDto)super.clone();
+        }catch (CloneNotSupportedException ex){
+            return null;
+        }
     }
 
     @Override

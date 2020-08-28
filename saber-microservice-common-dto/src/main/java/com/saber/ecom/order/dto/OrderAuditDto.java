@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
-public class OrderAuditDto implements Serializable {
+public class OrderAuditDto implements Serializable, Cloneable {
     private Integer id;
     private String orderStatus;
     private Date date;
@@ -55,6 +55,15 @@ public class OrderAuditDto implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, orderStatus, date);
+    }
+
+    @Override
+    public OrderAuditDto clone() {
+        try {
+            return (OrderAuditDto) super.clone();
+        } catch (CloneNotSupportedException ex) {
+            return null;
+        }
     }
 
     @Override
