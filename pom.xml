@@ -9,6 +9,7 @@
     <modules>
         <module>saber-microservice-common-dto</module>
         <module>saber-microservice-command-rest-controller</module>
+        <module>saber-microservice-command-and-event</module>
     </modules>
     <name>saber-microservice-axon-cqrs-saga-test1</name>
     <description>saber-microservice-axon-cqrs-saga-test1</description>
