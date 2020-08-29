@@ -1,8 +1,6 @@
 package com.saber.rmicroservice.commandand.event.config;
 
 import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
 import com.saber.rmicroservice.commandand.event.models.order.OrderEntity;
 import com.saber.rmicroservice.commandand.event.models.product.ProductEntity;
 import com.saber.rmicroservice.commandand.event.sagas.OrderProcessSaga;
@@ -38,12 +36,12 @@ import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Collections;
@@ -55,8 +53,9 @@ public class AppConfig {
 
     @PersistenceContext
     private EntityManager entityManager;
-
-    private final PlatformTransactionManager transactionManager;
+    @Qualifier(value = "transactionManager")
+    @Autowired
+    private  PlatformTransactionManager transactionManager;
 
     @Value("${ecom.amqp.rabbit.address}")
     private String rabbitMQAddress;
@@ -76,13 +75,8 @@ public class AppConfig {
     @Value("${ecom.amqp.rabbit.queue}")
     private String rabbitMQQueue;
 
-    @Value("${spring.data.mongodb.uri}")
-    private String mongoDbUri;
-
-
-    public AppConfig(@Qualifier(value = "transactionManager") PlatformTransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
-    }
+    @Autowired
+    private Mongo mongo;
 
 
     @Bean
@@ -218,7 +212,7 @@ public class AppConfig {
     @Bean
     public EventBus eventBus() {
         ClusteringEventBus eventBus =
-                new ClusteringEventBus(new DefaultClusterSelector(simpleCluster()));
+                new ClusteringEventBus(new DefaultClusterSelector(simpleCluster()),eventBusTerminal());
         eventBus.subscribe(sagaManager());
         return eventBus;
     }
@@ -228,24 +222,15 @@ public class AppConfig {
         return new SpringResourceInjector();
     }
 
-    @Bean
-    public Mongo mongo() {
-        try {
-            return new MongoClient(new MongoClientURI(this.mongoDbUri));
-        } catch (Exception ex) {
-            log.error("Error om Mongo Connection ...... " + ex.getMessage());
-            return null;
-        }
-    }
 
     @Bean
-    public MongoTemplate mongoTemplate() {
-        return new DefaultMongoTemplate(this.mongo());
+    public MongoTemplate mongoTemplateAxon() {
+        return new DefaultMongoTemplate(this.mongo);
     }
 
-    @Bean(name = "sagaManager")
+    @Bean(name = "sagaRepository")
     public SagaRepository sagaRepository() {
-        MongoSagaRepository sagaRepository = new MongoSagaRepository(mongoTemplate());
+        MongoSagaRepository sagaRepository = new MongoSagaRepository(mongoTemplateAxon());
         sagaRepository.setResourceInjector(springResourceInjector());
         return sagaRepository;
     }

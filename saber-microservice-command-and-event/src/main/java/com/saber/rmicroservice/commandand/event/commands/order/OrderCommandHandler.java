@@ -17,31 +17,34 @@ import java.security.SecureRandom;
 @Component
 @Slf4j
 public class OrderCommandHandler {
-
-    private final Repository<OrderEntity> orderEntityRepository;
-    private final Repository<ProductEntity> productEntityRepository;
+    @Qualifier(value = "orderRepository")
+    @Autowired
+    private Repository<OrderEntity> orderEntityRepository;
+    @Qualifier(value = "productRepository")
+    @Autowired
+    private Repository<ProductEntity> productEntityRepository;
     private final SecureRandom random;
 
-    public OrderCommandHandler(@Qualifier(value = "orderRepository")
-                                       Repository<OrderEntity> orderEntityRepository,
-                               @Qualifier(value = "productRepository")
-                                       Repository<ProductEntity> productEntityRepository) {
-        this.orderEntityRepository = orderEntityRepository;
-        this.productEntityRepository = productEntityRepository;
-        this.random = new SecureRandom();
+    public OrderCommandHandler() {
+       this.random = new SecureRandom();
     }
 
     @CommandHandler
     public void handleNewOrder(NewOrderCommand orderCommand) {
         log.info("Start handleNewOrder ................");
-        ProductEntity productEntity = this.productEntityRepository.load(orderCommand.getProductId());
-        productEntity.depreciateStock(orderCommand.getNumber());
-        Integer id = random.nextInt() + 1;
-        OrderEntity orderEntity =
-                new OrderEntity(id, orderCommand.getPrice(), orderCommand.getNumber(), OrderStatusEnum.NEW, productEntity);
-        this.orderEntityRepository.add(orderEntity);
-        log.debug("New Order Created with id: {}; Price: {}; Numbers: {} of Product ID: {}",
-                id, orderCommand.getPrice(), orderCommand.getNumber(), productEntity.getId());
+       try {
+           ProductEntity productEntity = this.productEntityRepository.load(orderCommand.getProductId());
+           productEntity.depreciateStock(orderCommand.getNumber());
+           Integer id = random.nextInt() + 1;
+           OrderEntity orderEntity =
+                   new OrderEntity(id, orderCommand.getPrice(), orderCommand.getNumber(), OrderStatusEnum.NEW, productEntity);
+           this.orderEntityRepository.add(orderEntity);
+           log.debug("New Order Created with id: {}; Price: {}; Numbers: {} of Product ID: {}",
+                   id, orderCommand.getPrice(), orderCommand.getNumber(), productEntity.getId());
+
+       }catch (Exception ex){
+           log.error("This Product with id {} Not Found ",orderCommand.getProductId());
+       }
 
         log.info("End handleNewOrder ....................");
 
@@ -50,10 +53,15 @@ public class OrderCommandHandler {
     @CommandHandler
     public void handleUpdateOrder(OrderStatusUpdateCommand orderStatusUpdateCommand) {
         log.info("Start handleUpdateOrder .............");
-        OrderEntity orderEntity = this.orderEntityRepository.load(orderStatusUpdateCommand.getOrderId());
-        orderEntity.updateOrderStatus(OrderStatusEnum.valueOf(orderStatusUpdateCommand.getOrderStatus()));
-        log.debug("Order with id: {} updated with status: {}", orderStatusUpdateCommand.getOrderId(),
-                orderStatusUpdateCommand.getOrderStatus());
+        try {
+            OrderEntity orderEntity = this.orderEntityRepository.load(orderStatusUpdateCommand.getOrderId());
+            orderEntity.updateOrderStatus(OrderStatusEnum.valueOf(orderStatusUpdateCommand.getOrderStatus()));
+            log.debug("Order with id: {} updated with status: {}", orderStatusUpdateCommand.getOrderId(),
+                    orderStatusUpdateCommand.getOrderStatus());
+        }catch (Exception ex){
+            log.error("this OrderEntity with id {} Not Found ",orderStatusUpdateCommand.getOrderId());
+        }
+
         log.info("End handleUpdateOrder .............");
     }
 }

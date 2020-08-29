@@ -28,45 +28,43 @@ public class OrderProcessSaga extends AbstractAnnotatedSaga implements Serializa
     private Integer orderId;
     private Integer productId;
     private Integer count;
+    @Qualifier(value = "distributedCommandGateway")
+    @Autowired
     private transient CommandGateway commandGateway;
 
-    @Autowired
-    public OrderProcessSaga(@Qualifier(value = "distributedCommandGateway") CommandGateway commandGateway) {
-        this.commandGateway = commandGateway;
-    }
 
     @StartSaga
     @SagaEventHandler(associationProperty = "orderId")
     public void handleOrderCreationEvent(OrderCreatedEvent orderCreatedEvent) {
-        log.info("Start handleOrderCreationEvent ........ ");
+        log.info("Start SAGA handleOrderCreationEvent ........ ");
         log.debug("Order Id for handleOrderCreationEvent : {} ", orderCreatedEvent.getOrderId());
         this.orderId = orderCreatedEvent.getOrderId();
         this.productId = orderCreatedEvent.getProductId();
         this.count = orderCreatedEvent.getNumber();
-        log.debug("Saga started for new order created with id: {}, for {} nos. of product with id: {} ",
+        log.info("Saga started for new order created with id: {}, for {} nos. of product with id: {} ",
                 orderId, count, productId);
-        log.info("End handleOrderCreationEvent");
+        log.info("End SAGA handleOrderCreationEvent");
     }
 
     @EndSaga
     @SagaEventHandler(associationProperty = "orderId")
     public void handleOrderCanceledEvent(OrderCancelEvent orderCancelEvent) {
-        log.info("Start handleOrderCanceledEvent");
-        log.debug("Order ID for OrderCancelledEvent : {}", orderCancelEvent.getOrderId());
+        log.info("Start SAGA handleOrderCanceledEvent");
+        log.info("Order ID for OrderCancelledEvent : {}", orderCancelEvent.getOrderId());
         this.commandGateway.send(new ProductStockRevertCommand(productId, count));
-        log.debug("Saga ending for order with id: {}, Command send for reverting {} nos. of product with id: {}",
+        log.info("Saga ending for order with id: {}, Command send for reverting {} nos. of product with id: {}",
                 orderId, count, productId);
 
-        log.info("End handleOrderCanceledEvent");
+        log.info("End SAGA handleOrderCanceledEvent");
     }
 
     @EndSaga
     @SagaEventHandler(associationProperty = "orderId")
     public void handleOrderConfirmedEvent(OrderConfirmEvent orderConfirmEvent){
-        log.info("Start handleOrderConfirmedEvent ............");
-        log.debug("Order ID for OrderConfirmedEvent : {}", orderConfirmEvent.getOrderId());
-        log.debug("Saga ending for order with id: {}, Order confirmed.", orderId);
-        log.info("End handleOrderConfirmedEvent ..........");
+        log.info("Start SAGA handleOrderConfirmedEvent ............");
+        log.info("Order ID for OrderConfirmedEvent : {}", orderConfirmEvent.getOrderId());
+        log.info("Saga ending for order with id: {}, Order confirmed.", orderId);
+        log.info("End SAGA handleOrderConfirmedEvent ..........");
     }
 
 

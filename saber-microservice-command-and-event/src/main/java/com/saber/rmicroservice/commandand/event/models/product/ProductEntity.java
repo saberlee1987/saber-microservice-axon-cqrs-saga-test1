@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.axonframework.domain.AbstractAggregateRoot;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;

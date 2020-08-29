@@ -49,7 +49,7 @@ public class OrderEntity extends AbstractAggregateRoot<Integer> {
              this.orderStatusEnum=orderStatusEnum;
              registerEvent(new OrderConfirmEvent(this.id));
         }
-        else if (orderStatusEnum == OrderStatusEnum.CANCELED){
+        else if (orderStatusEnum == OrderStatusEnum.CANCELLED){
             this.orderStatusEnum=orderStatusEnum;
             registerEvent(new OrderCancelEvent(this.id));
         }
